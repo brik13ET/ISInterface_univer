@@ -20,19 +20,22 @@ int main(int argc, char const *argv[])
     int b4 = 1 ? a1 / b1 : a1 % b1;
     int b5 = 1 ? a2 / b2 : a2 % b2;
     int b6 = 1 ? a3 / b3 : a3 % b3;
+    int ret = (group + b6) % 2;
     printf(
         "b1: %d\n"
         "b2: %d\n"
         "b3: %d\n"
         "b4: %d\n"
         "b5: %d\n"
-        "b6: %d\n",
+        "b6: %d\n"
+        "return code",
         b1,
         b2,
         b3,
         b4,
         b5,
-        b6
+        b6,
+        ret
     );
-    return (group + b6) % 2;
+    return ret;
 }

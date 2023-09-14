@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "javamain.h": "c",
+        "stdio.h": "c"
+    }
+}

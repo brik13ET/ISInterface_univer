@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"netdb.h": "c",
+			"include.h": "c",
+			"stdio.h": "c"
+		}
+	}
+}
