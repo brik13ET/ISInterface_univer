@@ -15,6 +15,38 @@ extern "C" {
 JNIEXPORT jint JNICALL Java_javaMain_add
   (JNIEnv *, jclass, jint, jint);
 
+/*
+ * Class:     javaMain
+ * Method:    init
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_javaMain_init
+  (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     javaMain
+ * Method:    deinit
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_javaMain_deinit
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     javaMain
+ * Method:    sendTo
+ * Signature: ([B)I
+ */
+JNIEXPORT jint JNICALL Java_javaMain_sendTo
+  (JNIEnv *, jclass, jbyteArray);
+
+/*
+ * Class:     javaMain
+ * Method:    recvFrom
+ * Signature: ([BI)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_javaMain_recvFrom
+  (JNIEnv *, jclass, jbyteArray, jint);
+
 #ifdef __cplusplus
 }
 #endif

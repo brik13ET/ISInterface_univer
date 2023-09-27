@@ -1,21 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cmake_var.h>
+#include "../../include.h"
 
-#ifndef getcwd
-    #ifdef WIN32
-        #include <windows.h>
-
-    #elif __linux__
-        #include <unistd.h>
-        #define getcwd(X) readlink()
-
-    #endif // __linux__ || WIN32
-#endif // getcwd
-
-int exec_verbose(char* cmd)
+int exec_verbose(char* cmd, char* prefix)
 {
-    printf("\"%s\":", cmd);
+    if (prefix == NULL)
+        prefix = "";
+    printf("%s %s:", prefix, cmd);
     printf("\n");
     return system(cmd);
 }
@@ -23,13 +15,15 @@ int exec_verbose(char* cmd)
 int main(int argc, char const *argv[])
 {
     printf(
-        "PROJECT_SOURCE_DIR: %s\n"
-        "CMAKE_BINARY_DIR: %s\n",
-        PROJECT_SOURCE_DIR,
-        CMAKE_BINARY_DIR
+        "Вариант %s\t%s\n%s\n",
+        F_len % 3 == 0 ? "ping":
+        F_len % 3 == 1 ? "udp" :
+                         "tcp",
+        I_len % 2 == 0 ? "IPv4": "IPv6",
+        "Для \"tcp\" отправить запрос на установку соединения TCP на MAC-адрес и IP-адрес сервера на порт 43522, получить подтверждение успешной установки соединения и вывести ответный пакет."
     );
-    
-    exec_verbose("pwd");
-    exec_verbose("java -Djava.library.path="CMAKE_BINARY_DIR" javaMain");
+    exec_verbose("grep -r -e 'GetStringUTFLength.*{' "JNI_INCLUDE_DIRS, "[C/C++ RT]");
+    exec_verbose("cd "CMAKE_CURRENT_BUILD_DIR, "[C/C++ RT]");
+    exec_verbose("java -Djava.library.path="CMAKE_CURRENT_BUILD_DIR" javaMain", "[C/C++ RT]");
     return 0;
 }

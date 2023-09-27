@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "javamain.h": "c",
-        "stdio.h": "c"
+        "jni.h": "c",
+        "errno.h": "c",
+        "ipv6.h": "c"
     }
 }

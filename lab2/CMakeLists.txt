@@ -5,8 +5,3 @@ set(C_STANDARD c11)
 project(LAB2_client)
 
 ADD_EXECUTABLE(LAB2_client src/client.c)
-
-
-project(LAB2_server)
-
-ADD_EXECUTABLE(LAB2_server src/server.c)

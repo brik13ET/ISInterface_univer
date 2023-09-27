@@ -28,7 +28,7 @@ int main(int argc, char const *argv[])
         "b4: %d\n"
         "b5: %d\n"
         "b6: %d\n"
-        "return code",
+        "return code %d",
         b1,
         b2,
         b3,

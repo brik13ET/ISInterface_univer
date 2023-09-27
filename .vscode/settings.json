@@ -1,3 +1,7 @@
 {
-    "cmake.sourceDirectory": "/media/briket/data/Git/ISInterfaces_univer"
+    "cmake.sourceDirectory": "/media/briket/data/Git/ISInterfaces_univer",
+    "files.associations": {
+        "include.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }

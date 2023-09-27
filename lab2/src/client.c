@@ -39,18 +39,8 @@ int main(int argc, char const *argv[])
 
     setsockopt(sd, SOL_SOCKET, SO_BROADCAST, &on, sizeof(on));
     printf("Socket created\n");
-    #if 0
-    if(connect(sd, (struct sockaddr*)&SOCK, sizeof(SOCK)) == -1)
-    {
-        fprintf(stderr, "connect() - fail\nerrno: %d\t%s\nExit...\n", errno, strerror(errno));
-        return errno;
-    }
-    printf("connect() success\n");
-    #endif
     
     result = sendto(sd, buf, sizeof(buf), 0, (struct sockaddr*)&SOCK, sizeof(SOCK));
-    // result = send(sd, buf, sizeof(buf), 0);
-    // result = write(sd, buf, sizeof(buf));
     if (result == -1)
     {
         fprintf(stderr, "send() - fail\nerrno: %d\t%s\nExit...\n", errno, strerror(errno));
