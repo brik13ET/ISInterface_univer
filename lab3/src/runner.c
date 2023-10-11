@@ -22,8 +22,7 @@ int main(int argc, char const *argv[])
         I_len % 2 == 0 ? "IPv4": "IPv6",
         "Для \"tcp\" отправить запрос на установку соединения TCP на MAC-адрес и IP-адрес сервера на порт 43522, получить подтверждение успешной установки соединения и вывести ответный пакет."
     );
-    exec_verbose("grep -r -e 'GetStringUTFLength.*{' "JNI_INCLUDE_DIRS, "[C/C++ RT]");
     exec_verbose("cd "CMAKE_CURRENT_BUILD_DIR, "[C/C++ RT]");
-    exec_verbose("java -Djava.library.path="CMAKE_CURRENT_BUILD_DIR" javaMain", "[C/C++ RT]");
+    exec_verbose("java -Djava.library.path="CMAKE_CURRENT_BUILD_DIR" -verbose:jni -Xcheck:jni javaMain", "[C/C++ RT]");
     return 0;
 }

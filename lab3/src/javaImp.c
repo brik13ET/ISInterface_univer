@@ -12,6 +12,7 @@
 #include <net/if.h>
 #include <net/ethernet.h>
 #include <net/if.h>  
+#include <net/if_arp.h>
 
 #include <linux/if_packet.h>
 #include <unistd.h>
@@ -25,7 +26,28 @@
 
 
 struct sockaddr addr;
+size_t addr_len;
 int sock_d, result;
+
+void jni_print(JNIEnv * env, char* str)
+{
+    #if 1
+    jclass j_system = (*env)->FindClass(env, "java/lang/System");
+    jfieldID j_outID = 
+        (*env)->GetStaticFieldID(
+            env,
+            j_system,
+            "out",
+            "Ljava/io/PrintStream;"
+        );
+    jobject j_out = (*env)->GetStaticObjectField(env, j_system, j_outID); //!!!!
+
+    jclass printstream = (*env)->FindClass(env, "java/io/PrintStream");
+    jmethodID printlnID = (*env)->GetMethodID(env, printstream, "print", "(Ljava/lang/String;)V");
+    jstring j_str = (*env)->NewStringUTF(env, str);
+    (*env)->CallVoidMethod(env, j_out, printlnID, j_str);
+    #endif
+}
 
 JNIEXPORT jint JNICALL Java_javaMain_add
 (
@@ -47,33 +69,32 @@ JNIEXPORT jboolean JNICALL Java_javaMain_init
 )
 {
     jboolean isCopy;
-    size_t iface_siz = GetStringUTFLength(env,interfaceName);
+    size_t iface_siz = (*env)->GetStringUTFLength(env,interfaceName);
     if (iface_siz > IFNAMSIZ)
         return 0;
-    char *cstr_iface,*cstr_iface_ = GetStringUTFChars(env, interfaceName, &isCopy);
-    if (!isCopy)
-    {
-        cstr_iface = malloc(iface_siz);
-        memcpy(cstr_iface, cstr_iface_, iface_siz);
-    }
-    else
-        cstr_iface = cstr_iface_;
-    ReleaseStringUTFChars(env, interfaceName, cstr_iface_);
+    const char *cstr_iface = (*env)->GetStringUTFChars(env, interfaceName, &isCopy);
 
-    addr = *(struct sockaddr*)&(struct sockaddr_in)
+    addr = *(struct sockaddr*)&(struct sockaddr_ll)
     {
-        .sin_family = AF_INET,
-        .sin_port = htons(43522),
-        .sin_addr.s_addr = INADDR_LOOPBACK
+        .sll_family = AF_PACKET,
+        .sll_protocol = ETH_P_ALL,
+        .sll_ifindex = if_nametoindex(cstr_iface),
+        .sll_hatype = ARPHRD_RAWIP,
+        .sll_pkttype = PACKET_HOST,
+        .sll_halen = 6,
+        .sll_addr = { 0 }
     };
-    sock_d = socket (PF_PACKET, SOCK_RAW, htons (ETH_P_ALL));
-    setsockopt(sock_d, SOL_SOCKET,SO_BINDTODEVICE, cstr_iface, IFNAMSIZ);
+    sock_d = socket (AF_PACKET, SOCK_RAW, htons (ETH_P_ALL));
+    if (sock_d < 0){
+        char buf[40] = { 0 };
+        sprintf(buf, "%s,%d:\terrno: %d\n",__FILE__,__LINE__-3, errno);
+        jni_print(env, buf);
+    }
 
-    if (!isCopy)
-        free(cstr_iface);
+    (*env)->ReleaseStringUTFChars(env, interfaceName, cstr_iface);
     if (sock_d == -1)
-        return 0;
-    return 1;
+        return JNI_FALSE;
+    return JNI_TRUE;
     
 }
 
@@ -94,11 +115,11 @@ JNIEXPORT jint JNICALL Java_javaMain_sendTo
     jbyteArray buf
 )
 {
-    jsize arr_len = GetArrayLength(env, buf);
-    uint8_t* mbuf = malloc(arr_len);
+    jsize arr_len = (*env)->GetArrayLength(env, buf);
+    int8_t* mbuf = malloc(arr_len);
     if (mbuf <= 0)
         return -1;
-    GetByteArrayRegion(env,buf,0,arr_len,mbuf);
+    (*env)->GetByteArrayRegion(env,buf,0,arr_len,mbuf);
     sendto(
         sock_d,
         mbuf,
@@ -119,19 +140,19 @@ JNIEXPORT jbyteArray JNICALL Java_javaMain_recvFrom
     jint offset
 )
 {
-    jsize arr_len = GetArrayLength(env, buf);
-    uint8_t* occur_buf = malloc(arr_len);
-    uint8_t* recv_buf = malloc(arr_len + offset);
+    jsize arr_len = (*env)->GetArrayLength(env, buf);
+    jbyte* occur_buf = malloc(arr_len);
+    jbyte* recv_buf = malloc(arr_len + offset);
     if (occur_buf <= 0)
         return NULL;
-    GetByteArrayRegion(env,buf,0,arr_len,occur_buf);
+    (*env)->GetByteArrayRegion(env,buf,0,arr_len,occur_buf);
     do
     {
         recvfrom(sock_d,recv_buf,arr_len+offset,0,NULL,NULL);
     } while (memcmp(recv_buf + offset, occur_buf, arr_len));
 
-    jbyteArray ret = NewByteArray( *env, arr_len + offset);
-    SetByteArrayRegion( ret,  0, arr_len + offset,recv_buf);
+    jbyteArray ret = (*env)->NewByteArray( env, arr_len + offset);
+    (*env)->SetByteArrayRegion(env, ret,  0, arr_len + offset,recv_buf);
     free(occur_buf);
     free(recv_buf);
     return ret;

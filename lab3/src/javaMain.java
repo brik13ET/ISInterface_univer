@@ -2,6 +2,7 @@ public class javaMain
 {
 	static {
 		System.loadLibrary("LAB3_impl");
+		System.out.println("Static init OK");
 	}
 	public static native int add(int a, int b);
 
@@ -21,22 +22,18 @@ public class javaMain
 	// которого совпадает с buf со смещения offset. Возвращает массив присланных байт.
 	public static native byte[] recvFrom(byte[] buf, int offset); 
 
-	public static void main(String[] args) 
+	public static void main(String[] args) throws NoSuchFieldException, SecurityException 
 	{
+		System.out.println("Main()");
 		boolean ok = javaMain.init("lo");
-		System.out.printf("init: %d\n", ok);
-		ok = 0 < javaMain.sendTo(
-			new byte[]
-			{
-				(byte)0xAA,
-				(byte)0xBB,
-				(byte)0xCC,
-				(byte)0xDD,
-				(byte)0xEE,
-				(byte)0xFF
-			}
-		);
-		System.out.printf("sendTo: %d\n", ok);
+		System.out.printf("init: %b\n", ok);
+		if (!ok)
+		{
+			System.out.println("Init failed");
+			return;
+		}
+		int sendto_cnt = javaMain.sendTo("Алеев Ибрагим Ильясович".getBytes());
+		System.out.printf("sendTo: %b\n", ok);
 		var buf = javaMain.recvFrom(
 			new byte[]
 			{
@@ -46,7 +43,7 @@ public class javaMain
 			0
 		);
 		ok = buf != null;
-		System.out.printf("recvFrom: %d\n", ok);
+		System.out.printf("recvFrom: %b\n", ok);
 		javaMain.deinit();
 	}
 }

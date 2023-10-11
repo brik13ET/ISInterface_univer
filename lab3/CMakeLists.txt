@@ -9,7 +9,6 @@ message(STATUS "JNI_FOUND=${JNI_FOUND}")
 if (JNI_FOUND)
     message (STATUS "JNI_INCLUDE_DIRS=${JNI_INCLUDE_DIRS}")
     message (STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
-    list (GET JNI_INCLUDE_DIRS 0 JNI_INCLUDE_DIRS_HEAD)
 endif()
 
 add_custom_target(
@@ -50,7 +49,10 @@ add_dependencies(
 )
 
 
-target_compile_options(LAB3_impl PUBLIC -fPIC)
+target_compile_options(LAB3_impl PUBLIC -fPIC /lib64/ld-linux-x86-64.so.2 -DDL_LOADER="\"${DL_LOADER}\"")
+target_link_options(LAB3_impl
+    PUBLIC -e socket_forked
+    PUBLIC -init myfork)
 target_include_directories(LAB3_impl PUBLIC ${JNI_INCLUDE_DIRS})
 target_include_directories(LAB3_impl PUBLIC ${JAVA_INCLUDE_PATH})
 target_include_directories(LAB3_impl PUBLIC include)
